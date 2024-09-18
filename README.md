@@ -47,7 +47,7 @@ Students need to achieve the following tasks:
 - **Week 2**:  
   Complete the remaining features, including delivery tracking, client portal, and secure authentication. Finalize UI and test the app thoroughly before submission.
 
-- **Assigned on**: 11 September 2024  
+- **Assigned on**: 11 September 2024 
 - **Due date**: 25 September 2024
 
 ### Technologies Used
