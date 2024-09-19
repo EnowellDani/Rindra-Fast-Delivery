@@ -16,7 +16,7 @@ Rindra Delivery Service requires a web application to manage daily operations, i
 Students need to achieve the following tasks:
 
 1. **Object-Oriented Design**:  
-   Develop appropriate classes for core entities such as `Order`, `User`, `Driver`, and `Client`. Implement OOP best practices, ensuring the code is modular and easy to maintain.
+   Develop appropriate classes for core entities such as `Order`, `Admin`, `User`, `Driver`, and `Client`. Implement OOP best practices, ensuring the code is modular and easy to maintain.
 
 2. **Order Management**:  
    Allow admins to create and manage delivery orders, update statuses, and assign orders to drivers. Ensure that the system validates inputs properly.
