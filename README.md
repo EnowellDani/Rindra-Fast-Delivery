@@ -39,7 +39,7 @@ Students need to achieve the following tasks:
 8. **Final Submission**:  
    Ensure the project is fully functional with thorough testing, and all features meet the specified requirements.
 
-### Milestones and Timeline:
+### Milestones and Timeline
 
 - **Week 1**:  
   Focus on designing the class structure, setting up the database, and implementing basic order management functionality.
