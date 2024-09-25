@@ -83,103 +83,122 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['create_order'])) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Dashboard</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="style.css" rel="stylesheet"> <!-- Link your CSS file -->
 </head>
 <body>
+
+<!-- Navbar -->
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <a class="navbar-brand" href="index.php">Rindra Delivery Service</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav">
+            <li class="nav-item active">
+                <a class="nav-link" href="logout.php">Logout</a>
+            </li>
+        </ul>
+    </div>
+</nav>
+
 <div class="container mt-2">
-    <form method="POST" action="logout.php">
-        <button type="submit" class="btn btn-danger">Logout</button>
-    </form>
-</div>
-<div class="container mt-5">
-    <h2>Pending User Approvals</h2>
-    <table class="table">
-        <thead>
-            <tr>
-                <th>ID</th>
-                <th>Username</th>
-                <th>Email</th>
-                <th>Phone</th>
-                <th>Role</th>
-                <th>Actions</th>
-            </tr>
-        </thead>
-        <tbody>
-            <?php foreach ($pending_users as $user): ?>
-                <tr>
-                    <td><?= htmlspecialchars($user['id']) ?></td>
-                    <td><?= htmlspecialchars($user['username'] ?? 'N/A') ?></td>
-                    <td><?= htmlspecialchars($user['email']) ?></td>
-                    <td><?= htmlspecialchars($user['phone']) ?></td>
-                    <td><?= htmlspecialchars($user['role']) ?></td>
-                    <td>
-                        <form method="POST" action="admin_dashboard.php">
-                            <input type="hidden" name="user_id" value="<?= htmlspecialchars($user['id']) ?>">
-                            <button type="submit" name="action" value="approve" class="btn btn-success">Approve</button>
-                            <button type="submit" name="action" value="reject" class="btn btn-danger">Reject</button>
-                        </form>
-                    </td>
-                </tr>
-            <?php endforeach; ?>
-        </tbody>
-    </table>
-
-    <h2 class="mt-5">Orders Overview</h2>
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Order ID</th>
-                <th>Client Name</th>
-                <th>Client Phone</th>
-                <th>Delivery Address</th>
-                <th>Assign Driver</th>
-            </tr>
-        </thead>
-        <tbody>
-            <?php foreach ($orders as $order): ?>
-                <tr>
-                    <td><?= htmlspecialchars($order['id']) ?></td>
-                    <td><?= htmlspecialchars($order['client_name']) ?></td>
-                    <td><?= htmlspecialchars($order['client_phone']) ?></td>
-                    <td><?= htmlspecialchars($order['address']) ?></td>
-                    <td>
-                        <form method="POST" action="admin_dashboard.php">
-                            <input type="hidden" name="order_id" value="<?= htmlspecialchars($order['id']) ?>">
-                            <select name="driver_id" class="form-select" required>
-                                <option value="">Select Driver</option>
-                                <?php foreach ($drivers as $driver): ?>
-                                    <option value="<?= htmlspecialchars($driver['id']) ?>">
-                                        <?= htmlspecialchars($driver['name']) ?>
-                                    </option>
-                                <?php endforeach; ?>
-                            </select>
-                            <button type="submit" name="order_action" value="assign" class="btn btn-primary mt-2">Assign</button>
-                        </form>
-                    </td>
-                </tr>
-            <?php endforeach; ?>
-        </tbody>
-    </table>
-
-    <h2 class="mt-5">Create New Order</h2>
-    <form method="POST" action="admin_dashboard.php">
-        <div class="mb-3">
-            <label for="client_id" class="form-label">Select Client</label>
-            <select name="client_id" class="form-select" required>
-                <option value="">Choose a client...</option>
-                <?php
-                // Fetch all clients for the order creation form
-                $clients = $pdo->query("SELECT id, name FROM clients")->fetchAll(PDO::FETCH_ASSOC);
-                foreach ($clients as $client): ?>
-                    <option value="<?= htmlspecialchars($client['id']); ?>"><?= htmlspecialchars($client['name']); ?></option>
-                <?php endforeach; ?>
-            </select>
+    <div class="card dashboard-container">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <h2 class="mb-0 text-center mx-auto">Admin Dashboard</h2>
         </div>
-        <div class="mb-3">
-            <label for="address" class="form-label">Delivery Address</label>
-            <input type="text" class="form-control" id="address" name="address" required>
+        <div class="card-body">
+            <h3 class="dashboard-header">Pending User Approvals</h3>
+            <table class="table table-striped table-bordered">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Username</th>
+                        <th>Email</th>
+                        <th>Phone</th>
+                        <th>Role</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php foreach ($pending_users as $user): ?>
+                        <tr>
+                            <td><?= htmlspecialchars($user['id']) ?></td>
+                            <td><?= htmlspecialchars($user['username'] ?? 'N/A') ?></td>
+                            <td><?= htmlspecialchars($user['email']) ?></td>
+                            <td><?= htmlspecialchars($user['phone']) ?></td>
+                            <td><?= htmlspecialchars($user['role']) ?></td>
+                            <td>
+                                <form method="POST" action="admin_dashboard.php">
+                                    <input type="hidden" name="user_id" value="<?= htmlspecialchars($user['id']) ?>">
+                                    <button type="submit" name="action" value="approve" class="btn btn-success btn-sm">Approve</button>
+                                    <button type="submit" name="action" value="reject" class="btn btn-danger btn-sm">Reject</button>
+                                </form>
+                            </td>
+                        </tr>
+                    <?php endforeach; ?>
+                </tbody>
+            </table>
+
+            <h3 class="dashboard-header mt-5">Orders Overview</h3>
+            <table class="table table-striped table-bordered">
+                <thead>
+                    <tr>
+                        <th>Order ID</th>
+                        <th>Client Name</th>
+                        <th>Client Phone</th>
+                        <th>Delivery Address</th>
+                        <th>Assign Driver</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php foreach ($orders as $order): ?>
+                        <tr>
+                            <td><?= htmlspecialchars($order['id']) ?></td>
+                            <td><?= htmlspecialchars($order['client_name']) ?></td>
+                            <td><?= htmlspecialchars($order['client_phone']) ?></td>
+                            <td><?= htmlspecialchars($order['address']) ?></td>
+                            <td>
+                                <form method="POST" action="admin_dashboard.php">
+                                    <input type="hidden" name="order_id" value="<?= htmlspecialchars($order['id']) ?>">
+                                    <select name="driver_id" class="form-select" required>
+                                        <option value="">Select Driver</option>
+                                        <?php foreach ($drivers as $driver): ?>
+                                            <option value="<?= htmlspecialchars($driver['id']) ?>">
+                                                <?= htmlspecialchars($driver['name']) ?>
+                                            </option>
+                                        <?php endforeach; ?>
+                                    </select>
+                                    <button type="submit" name="order_action" value="assign" class="btn btn-primary btn-sm mt-2">Assign</button>
+                                </form>
+                            </td>
+                        </tr>
+                    <?php endforeach; ?>
+                </tbody>
+            </table>
+
+            <h3 class="dashboard-header mt-5">Create New Order</h3>
+            <form method="POST" action="admin_dashboard.php">
+                <div class="mb-3">
+                    <label for="client_id" class="form-label">Select Client</label>
+                    <select name="client_id" class="form-select" required>
+                        <option value="">Choose a client...</option>
+                        <?php
+                        // Fetch all clients for the order creation form
+                        $clients = $pdo->query("SELECT id, name FROM clients")->fetchAll(PDO::FETCH_ASSOC);
+                        foreach ($clients as $client): ?>
+                            <option value="<?= htmlspecialchars($client['id']); ?>"><?= htmlspecialchars($client['name']); ?></option>
+                        <?php endforeach; ?>
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label for="address" class="form-label">Delivery Address</label>
+                    <input type="text" class="form-control" id="address" name="address" required>
+                </div>
+                <button type="submit" name="create_order" class="btn btn-success">Create Order</button>
+            </form>
         </div>
-        <button type="submit" name="create_order" class="btn btn-success">Create Order</button>
-    </form>
+    </div>
 </div>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>

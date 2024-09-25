@@ -1,0 +1,154 @@
+/* General Styles */
+body {
+    background: linear-gradient(135deg, #F4F4F9 0%, #E9E9F0 100%);  /* Subtle gradient background */
+    font-family: 'Arial', sans-serif;  /* Clean font */
+    color: #333;  /* Darker text color for readability */
+    margin: 0;  /* Remove default margin */
+    padding: 0;  /* Remove default padding */
+}
+
+/* Container Styles */
+.container {
+    margin: 0 auto;  /* Center the container */
+    padding: 20px;  /* Add padding */
+}
+
+/* Dashboard Container */
+.dashboard-container {
+    padding: 40px;
+    background-color: #fff;  /* White background for the card */
+    border-radius: 10px;
+    box-shadow: 0px 8px 24px rgba(0, 0, 0, 0.15);  /* Deeper shadow for a floating effect */
+    max-width: 600px;  /* Set a maximum width for the card */
+    width: 100%;  /* Ensure it takes full width within max-width */
+    margin: 20px auto;  /* Center the card */
+}
+
+/* Headers */
+h2.dashboard-header {
+    font-size: 28px;
+    color: #001F3F;  /* Navy blue color */
+    text-align: center;
+    margin-bottom: 20px;
+    font-weight: bold;  /* Make header bold */
+}
+
+h4 {
+    text-align: center;
+    margin-bottom: 15px;
+    font-weight: bold;  /* Make header bold */
+}
+
+/* Table Styles */
+.table-custom {
+    border: 2px solid #001F3F;  /* Navy blue */
+    border-radius: 5px;
+    width: 100%;  /* Full width */
+    margin-top: 20px;  /* Space above the table */
+    overflow: hidden;  /* Prevent border-radius from being overridden */
+}
+
+.table-custom th, .table-custom td {
+    border-color: #001F3F;  /* Table border color */
+    padding: 12px;  /* Add padding to table cells */
+}
+
+.table-custom thead {
+    background-color: #001F3F;  /* Header background color */
+    color: white;  /* Header text color */
+}
+
+/* Button Styles */
+.btn-primary {
+    background-color: #001F3F;  /* Navy blue */
+    border: none;  /* Remove border */
+    color: white;  /* White text color */
+    border-radius: 8px;  /* More rounded corners */
+    padding: 10px 20px;  /* Increased padding */
+    transition: background-color 0.3s ease, transform 0.3s ease;  /* Smooth transition */
+}
+
+.btn-primary:hover {
+    background-color: #0b2d65;  /* Darker shade on hover */
+    transform: scale(1.05);  /* Slightly enlarge on hover */
+}
+
+.btn-success {
+    background-color: #001F3F;  /* Navy blue */
+}
+
+/* Footer Styles */
+.footer {
+    text-align: center;
+    margin-top: 20px;
+    font-size: 14px;
+    color: #888;
+}
+
+/* Form Styles */
+.form-group {
+    margin-bottom: 15px;  /* Space between form groups */
+}
+
+.form-control {
+    border: 1px solid #001F3F;  /* Border color */
+    border-radius: 5px;  /* Rounded corners */
+    transition: border-color 0.3s ease;  /* Smooth transition */
+    padding: 10px;  /* Add padding */
+}
+
+.form-control:focus {
+    border-color: #0b2d65;  /* Change border color on focus */
+    box-shadow: 0 0 5px rgba(0, 31, 63, 0.5);  /* Add shadow on focus */
+}
+
+/* Alert Styles */
+.alert {
+    border-radius: 5px;  /* Rounded corners */
+}
+
+/* Card Styles */
+.card {
+    border-radius: 15px;  /* Rounded corners for the card */
+    box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);  /* Subtle shadow for depth */
+    margin-bottom: 20px;  /* Space below the card */
+}
+
+/* Card Header Styles */
+.card-header {
+    display: flex;  /* Use flexbox for layout */
+    justify-content: space-between;  /* Space out title and button */
+    align-items: center;  /* Center align items */
+    padding: 10px;  /* Add some padding */
+}
+
+/* Card Title */
+.card-title {
+    color: #001F3F;  /* Navy blue */
+}
+
+/* Logout Button */
+.logout-btn {
+    background-color: #dc3545;  /* Red background for the logout button */
+    border: none;  /* Remove border */
+    color: white;  /* White text color */
+    padding: 8px 15px;  /* Padding for the button */
+    border-radius: 5px;  /* Rounded corners */
+    transition: background-color 0.3s ease;  /* Smooth transition */
+}
+
+.logout-btn:hover {
+    background-color: #c82333;  /* Darker shade on hover */
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+    .dashboard-container {
+        max-width: 90%;  /* Use a higher percentage for smaller screens */
+        padding: 20px;  /* Reduced padding for smaller screens */
+    }
+
+    h2.dashboard-header {
+        font-size: 24px;  /* Adjust font size for smaller screens */
+    }
+}

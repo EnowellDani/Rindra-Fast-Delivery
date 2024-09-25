@@ -37,79 +37,59 @@ $order_history = $stmt->fetchAll(PDO::FETCH_ASSOC);
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="style.css">  <!-- Link to your external CSS file -->
     <title>Client Dashboard</title>
-
-    <!-- Custom styles -->
-    <style>
-        body {
-            background-color: #F4F4F9;
-            font-family: 'Arial', sans-serif;
-        }
-        .dashboard-container {
-            padding: 40px;
-            background-color: #fff;
-            border-radius: 10px;
-            box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
-        }
-        .dashboard-header {
-            font-size: 28px;
-            color: #BE6DB7;
-            text-align: center;
-            margin-bottom: 20px;
-        }
-        .table-custom {
-            border: 2px solid #BE6DB7;
-            border-radius: 5px;
-        }
-        .table-custom th, .table-custom td {
-            border-color: #BE6DB7;
-        }
-        .table-custom thead {
-            background-color: #BE6DB7;
-            color: white;
-        }
-        .footer {
-            text-align: center;
-            margin-top: 20px;
-            font-size: 14px;
-            color: #888;
-        }
-    </style>
 </head>
 <body>
+
+<!-- Navbar -->
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <a class="navbar-brand" href="index.php">Rindra Delivery Service</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav">
+            <li class="nav-item active">
+                <a class="nav-link" href="logout.php">Logout</a> 
+            </li>
+        </ul>
+    </div>
+</nav>
 
 <div class="container mt-5">
     <div class="dashboard-container">
         <h2 class="dashboard-header">Welcome to Your Dashboard, <?= htmlspecialchars($client_name); ?>!</h2>
+
         <h4 class="text-center mb-4">Active Orders</h4>
 
-    <!-- Active Orders Table -->
-    <?php if (!empty($active_orders)): ?>
-        <table class="table table-custom table-bordered">
-            <thead>
-                <tr>
-                    <th>Order ID</th>
-                    <th>Status</th>
-                    <th>Driver Name</th>
-                    <th>Delivery Address</th>
-                    <th>Contact Info</th> <!-- Updated to show client's phone -->
-                </tr>
-            </thead>
-            <tbody>
-                <?php foreach ($active_orders as $order): ?>
+        <!-- Active Orders Table -->
+        <?php if (!empty($active_orders)): ?>
+            <table class="table table-custom table-bordered">
+                <thead>
                     <tr>
-                        <td><?= htmlspecialchars($order['id']); ?></td>
-                        <td><?= ucfirst(htmlspecialchars($order['status'])); ?></td>
-                        <td><?= htmlspecialchars($order['driver_name'] ?: 'Not Assigned'); ?></td>
-                        <td><?= htmlspecialchars($order['address']); ?></td>
-                        <td><?= htmlspecialchars($order['client_phone'] ?? ''); ?></td> <!-- Updated line -->
+                        <th>Order ID</th>
+                        <th>Status</th>
+                        <th>Driver Name</th>
+                        <th>Delivery Address</th>
+                        <th>Contact Info</th> <!-- Updated to show client's phone -->
                     </tr>
-                <?php endforeach; ?>
-            </tbody>
-        </table>
-    <?php else: ?>
-        <p class="text-center">You have no active orders.</p>
-    <?php endif; ?>
+                </thead>
+                <tbody>
+                    <?php foreach ($active_orders as $order): ?>
+                        <tr>
+                            <td><?= htmlspecialchars($order['id']); ?></td>
+                            <td><?= ucfirst(htmlspecialchars($order['status'])); ?></td>
+                            <td><?= htmlspecialchars($order['driver_name'] ?: 'Not Assigned'); ?></td>
+                            <td><?= htmlspecialchars($order['address']); ?></td>
+                            <td><?= htmlspecialchars($order['client_phone'] ?? ''); ?></td> <!-- Updated line -->
+                        </tr>
+                    <?php endforeach; ?>
+                </tbody>
+            </table>
+        <?php else: ?>
+            <p class="text-center">You have no active orders.</p>
+        <?php endif; ?>
 
         <h4 class="text-center mb-4 mt-5">Order History</h4>
 
@@ -134,7 +114,7 @@ $order_history = $stmt->fetchAll(PDO::FETCH_ASSOC);
                             <td><?= htmlspecialchars($order['driver_name'] ?: 'Not Assigned'); ?></td>
                             <td><?= htmlspecialchars($order['updated_at']); ?></td>
                             <td><?= htmlspecialchars($order['address']); ?></td>
-                            <td><?= htmlspecialchars($order['contact_info']); ?></td>
+                            <td><?= htmlspecialchars($order['client_phone'] ?? ''); ?></td> <!-- Updated line -->
                         </tr>
                     <?php endforeach; ?>
                 </tbody>
