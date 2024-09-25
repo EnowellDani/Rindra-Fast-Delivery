@@ -1,8 +1,8 @@
 <?php
 session_start();
-require 'database.php';  // Ensure this path is correct
-require 'order.php';     // Assuming you have an Order class
-require 'driver.php';    // Assuming you have a Driver class
+require 'database.php';  // Include database connection
+require 'order.php';     // Include the Order class
+require 'driver.php';    // Include the Driver class
 
 // Check if the driver is logged in
 if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'driver') {
@@ -28,6 +28,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     } else {
         $message = "Failed to update order status!";
     }
+
+    // Refresh the assigned orders after updating the status
+    $assignedOrders = $driver->getAssignedOrders();
 }
 ?>
 
@@ -50,7 +53,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <?php endif; ?>
 
     <h2>Assigned Orders</h2>
-    <table class="table">
+    <table class="table table-striped">
         <thead>
             <tr>
                 <th>Client Name</th>
@@ -60,24 +63,30 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             </tr>
         </thead>
         <tbody>
-            <?php foreach ($assignedOrders as $order): ?>
+            <?php if (empty($assignedOrders)): ?>
                 <tr>
-                    <td><?= htmlspecialchars($order['client_name']) ?></td>
-                    <td><?= htmlspecialchars($order['delivery_address']) ?></td>
-                    <td><?= htmlspecialchars($order['status']) ?></td>
-                    <td>
-                        <form method="POST">
-                            <input type="hidden" name="order_id" value="<?= $order['id'] ?>">
-                            <select name="status" class="form-select">
-                                <option value="pending" <?= $order['status'] === 'pending' ? 'selected' : '' ?>>Pending</option>
-                                <option value="picked_up" <?= $order['status'] === 'picked_up' ? 'selected' : '' ?>>Picked Up</option>
-                                <option value="delivered" <?= $order['status'] === 'delivered' ? 'selected' : '' ?>>Delivered</option>
-                            </select>
-                            <button type="submit" class="btn btn-primary mt-2">Update</button>
-                        </form>
-                    </td>
+                    <td colspan="4" class="text-center">No assigned orders found.</td>
                 </tr>
-            <?php endforeach; ?>
+            <?php else: ?>
+                <?php foreach ($assignedOrders as $order): ?>
+                    <tr>
+                        <td><?= htmlspecialchars($order['client_name']) ?></td>
+                        <td><?= htmlspecialchars($order['delivery_address']) ?></td>
+                        <td><?= htmlspecialchars($order['status']) ?></td>
+                        <td>
+                            <form method="POST">
+                                <input type="hidden" name="order_id" value="<?= htmlspecialchars($order['id']) ?>">
+                                <select name="status" class="form-select">
+                                    <option value="pending" <?= $order['status'] === 'pending' ? 'selected' : '' ?>>Pending</option>
+                                    <option value="picked_up" <?= $order['status'] === 'picked_up' ? 'selected' : '' ?>>Picked Up</option>
+                                    <option value="delivered" <?= $order['status'] === 'delivered' ? 'selected' : '' ?>>Delivered</option>
+                                </select>
+                                <button type="submit" class="btn btn-primary mt-2">Update</button>
+                            </form>
+                        </td>
+                    </tr>
+                <?php endforeach; ?>
+            <?php endif; ?>
         </tbody>
     </table>
 </div>
