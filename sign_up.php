@@ -1,27 +1,57 @@
 <?php
 session_start();
-require 'database.php'; // Include your database connection
+require 'database.php';  // Include your database connection
+
+$message = ''; // Variable to store success or error message
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $username = $_POST['username'];
+    $name = $_POST['name'];    // Get name from the form
     $email = $_POST['email'];
-    $phone = $_POST['phone'];
-    $role = $_POST['role']; // admin, driver, or client
+    $phone = $_POST['phone'];  // Get phone number
+    $address = $_POST['address'];  // Get address
     $password = $_POST['password'];
+    $role = $_POST['role'];
 
     // Hash the password
-    $hashed_password = password_hash($password, PASSWORD_DEFAULT);
+    $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
 
-    try {
-        // Insert new user into the pending_users table
-        $stmt = $db->prepare("INSERT INTO pending_users (username, email, phone, role, password) VALUES (?, ?, ?, ?, ?)");
-        $stmt->execute([$username, $email, $phone, $role, $hashed_password]);
+    // Separate queries for checking if the email already exists in each table
+    $tables = ['pending_users', 'clients', 'drivers', 'admins'];
+    $emailExists = false;
 
-        // Success message
-        echo '<div class="alert alert-success">Your registration is submitted and waiting for admin approval.</div>';
-    } catch (PDOException $e) {
-        // Handle any errors (like duplicate email)
-        echo '<div class="alert alert-danger">Error: ' . $e->getMessage() . '</div>';
+    foreach ($tables as $table) {
+        $stmt = $pdo->prepare("SELECT email FROM $table WHERE email = :email");
+        $stmt->execute([':email' => $email]);
+
+        if ($stmt->fetchColumn()) {
+            $emailExists = true;
+            break;
+        }
+    }
+
+    if ($emailExists) {
+        $message = '<div class="alert alert-danger">Error: This email is already registered. Please use a different email.</div>';
+    } else {
+        // Prepare the INSERT statement into the pending_users table
+        $stmt = $pdo->prepare("
+            INSERT INTO pending_users (username, email, phone, role, password, address) 
+            VALUES (:username, :email, :phone, :role, :password, :address)
+        ");
+        
+        $params = [
+            ':username' => $name,
+            ':email' => $email,
+            ':phone' => $phone,
+            ':role' => $role,
+            ':password' => $hashedPassword,
+            ':address' => $address
+        ];
+
+        if ($stmt->execute($params)) {
+            $message = '<div class="alert alert-success">Registration successful. Please wait for admin approval.</div>';
+        } else {
+            $message = '<div class="alert alert-danger">Error during registration. Please try again.</div>';
+        }
     }
 }
 ?>
@@ -31,36 +61,46 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
     <title>Sign Up</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
 <body>
-<div class="container">
+<div class="container mt-5">
     <h2>Sign Up</h2>
+
+    <!-- Display message for errors or success -->
+    <?php if ($message): ?>
+        <?= $message; ?>
+    <?php endif; ?>
+
     <form method="POST" action="sign_up.php">
-        <div class="form-group">
-            <label for="username">Username</label>
-            <input type="text" id="username" name="username" class="form-control" required>
+        <div class="mb-3">
+            <label for="name" class="form-label">Name</label>
+            <input type="text" class="form-control" id="name" name="name" required>
         </div>
-        <div class="form-group">
-            <label for="email">Email</label>
-            <input type="email" id="email" name="email" class="form-control" required>
+        <div class="mb-3">
+            <label for="email" class="form-label">Email</label>
+            <input type="email" class="form-control" id="email" name="email" required>
         </div>
-        <div class="form-group">
-            <label for="phone">Phone</label>
-            <input type="text" id="phone" name="phone" class="form-control">
+        <div class="mb-3">
+            <label for="phone" class="form-label">Phone</label>
+            <input type="text" class="form-control" id="phone" name="phone" required>
         </div>
-        <div class="form-group">
-            <label for="role">Role</label>
-            <select id="role" name="role" class="form-control" required>
-                <option value="admin">Admin</option>
-                <option value="driver">Driver</option>
+        <div class="mb-3">
+            <label for="password" class="form-label">Password</label>
+            <input type="password" class="form-control" id="password" name="password" required>
+        </div>
+        <div class="mb-3">
+            <label for="role" class="form-label">Role</label>
+            <select class="form-select" id="role" name="role" required>
                 <option value="client">Client</option>
+                <option value="driver">Driver</option>
+                <option value="admin">Admin</option>
             </select>
         </div>
-        <div class="form-group">
-            <label for="password">Password</label>
-            <input type="password" id="password" name="password" class="form-control" required>
+        <div class="mb-3">
+            <label for="address" class="form-label">Address (optional for clients)</label>
+            <input type="text" class="form-control" id="address" name="address">
         </div>
         <button type="submit" class="btn btn-primary">Sign Up</button>
     </form>
