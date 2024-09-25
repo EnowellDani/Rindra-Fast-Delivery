@@ -1,10 +1,10 @@
 <?php
 session_start();
-require 'database.php';  // Include database connection
+require 'D:\ApplicationDir\laragon\Rindra-Fast-Delivery\database.php';  // Include database connection
 
 // Check if the user is logged in and is a driver
 if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'driver') {
-    header("Location: index.php"); // Redirect to login page if not logged in or not a driver
+    header("Location: ../login.php"); // Redirect to login page if not logged in or not a driver
     exit;
 }
 
@@ -21,7 +21,7 @@ $orders = $stmt->fetchAll(PDO::FETCH_ASSOC);
 $successMessage = ''; // Initialize success message variable
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_order'])) {
     $order_id = $_POST['order_id'];
-    $status = $_POST['status']; // 'pending', 'completed', or 'canceled'
+    $status = $_POST['status']; // 'in-progress', 'completed', or 'canceled'
 
     // Update the order status in the orders table
     $stmt = $pdo->prepare("UPDATE orders SET status = :status WHERE id = :order_id");
@@ -64,19 +64,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_order'])) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Driver Dashboard</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="style.css" rel="stylesheet"> <!-- Link your CSS file -->
+    <link href="../style.css" rel="stylesheet"> <!-- Link your CSS file -->
 </head>
 <body>
     <header>
         <nav class="navbar navbar-expand-lg navbar-light bg-light">
-            <a class="navbar-brand" href="index.php">Rindra Delivery Service</a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <a class="navbar-brand" href="../index.php">Rindra Delivery Service</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav">
                     <li class="nav-item active">
-                        <a class="nav-link" href="logout.php">Logout</a>
+                        <a class="nav-link" href="../logout.php">Logout</a> <!-- Updated path -->
                     </li>
                 </ul>
             </div>
@@ -88,52 +88,48 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_order'])) {
             <div class="alert alert-success"><?= htmlspecialchars($successMessage) ?></div>
         <?php endif; ?>
         
-        <div class="card-body">
-            <h3 class="dashboard-header">Assigned Orders</h3>
-            <table class="table table-striped table-bordered">
-                <thead>
-                    <tr>
-                        <th>Order ID</th>
-                        <th>Client Name</th>
-                        <th>Client Phone</th>
-                        <th>Delivery Address</th>
-                        <th>Status</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <?php if (empty($orders)): ?>
+        <div class="card">
+            <div class="card-header">
+                <h3 class="dashboard-header">Assigned Orders</h3>
+            </div>
+            <div class="card-body">
+                <table class="table table-striped table-bordered ">
+                    <thead>
                         <tr>
-                            <td colspan="6" class="text-center">No orders assigned.</td>
+                            <th>Order ID</th>
+                            <th>Client Name</th>
+                            <th>Client Phone</th>
+                            <th>Address</th>
+                            <th>Status</th>
+                            <th>Actions</th>
                         </tr>
-                    <?php else: ?>
+                    </thead>
+                    <tbody>
                         <?php foreach ($orders as $order): ?>
                             <tr>
-                                <td><?= htmlspecialchars($order['id']) ?></td>
-                                <td><?= htmlspecialchars($order['client_name']) ?></td>
-                                <td><?= htmlspecialchars($order['client_phone']) ?></td>
-                                <td><?= htmlspecialchars($order['address']) ?></td>
-                                <td><?= htmlspecialchars($order['status']) ?></td>
+                                <td><?= $order['id'] ?></td>
+                                <td><?= $order['client_name'] ?></td>
+                                <td><?= $order['client_phone'] ?></td>
+                                <td><?= $order['address'] ?></td>
+                                <td><?= $order['status'] ?></td>
                                 <td>
-                                    <form method="POST" action="driver_dashboard.php">
-                                        <input type="hidden" name="order_id" value="<?= htmlspecialchars($order['id']) ?>">
-                                        <select name="status" class="form-select" required>
-                                            <option value="">Update Status</option>
+                                    <form action="" method="post">
+                                        <input type="hidden" name="order_id" value="<?= $order['id'] ?>">
+                                        <select name="status">
                                             <option value="pending">Pending</option>
+                                            <option value="in-progress">In Progress</option>
                                             <option value="completed">Completed</option>
                                             <option value="canceled">Canceled</option>
                                         </select>
-                                        <button type="submit" name="update_order" class="btn btn-primary btn-sm mt-2">Update</button>
+                                        <button type="submit" name="update_order" class="btn btn-primary">Update Status</button>
                                     </form>
                                 </td>
                             </tr>
                         <?php endforeach; ?>
-                    <?php endif; ?>
-                </tbody>
-            </table>
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
-
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

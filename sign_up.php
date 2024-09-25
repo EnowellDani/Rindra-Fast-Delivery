@@ -81,8 +81,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             if ($stmt->execute($params)) {
                 $_SESSION['signup_message'] = 'Thank you for signing up! Please wait for approval and check your email for updates regarding your registration.';
-                // Redirect to index.php after successful registration
-                header('Location: index.php');
+                // Redirect to login.php after successful registration
+                header('Location: login.php'); // Change to login page
                 exit(); // Stop further execution
             } else {
                 $message .= '<div class="alert alert-danger">Error during registration. Please try again.</div>';
@@ -107,62 +107,50 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav">
         <span class="navbar-toggler-icon"></span>
     </button>
-    <div class="collapse navbar-collapse" id="navbarNav">
-        <ul class="navbar-nav">
-            <li class="nav-item active">
-                <a class="nav-link" href="index.php">Home</a>
-            </li>
-        </ul>
-    </div>
 </nav>
 
 <div class="container mt-5">
     <div class="card">
         <div class="card-header">
             <h2>Sign Up</h2>
-        </div>
+        </div >
         <div class="card-body">
-
-            <!-- Display message for errors or success -->
-            <?php if ($message): ?>
-                <?= $message; ?>
-            <?php endif; ?>
-
             <form method="POST" action="sign_up.php">
-                <div class="mb-3">
-                    <label for="name" class="form-label">Name</label>
+                <div class="form-group">
+                    <label for="name">Name:</label>
                     <input type="text" class="form-control" id="name" name="name" required>
                 </div>
-                <div class="mb-3">
-                    <label for="email" class="form-label">Email</label>
+                <div class="form-group">
+                    <label for="email">Email:</label>
                     <input type="email" class="form-control" id="email" name="email" required>
                 </div>
-                <div class="mb-3">
-                    <label for="phone" class="form-label">Phone</label>
-                    <input type="text" class="form-control" id="phone" name="phone" required>
+                <div class="form-group">
+                    <label for="phone">Phone Number:</label>
+                    <input type="tel" class="form-control" id="phone" name="phone">
                 </div>
-                <div class="mb-3">
-                    <label for="password" class="form-label">Password</label>
+                <div class="form-group">
+                    <label for="address">Address:</label>
+                    <input type="text" class="form-control" id="address" name="address">
+                </div>
+                <div class="form-group">
+                    <label for="password">Password:</label>
                     <input type="password" class="form-control" id="password" name="password" required>
                 </div>
-                <div class="mb-3">
-                    <label for="role" class="form-label">Role</label>
-                    <select class="form-select" id="role" name="role" required>
+                <div class="form-group">
+                    <label for="role">Role:</label>
+                    <select class="form-control" id="role" name="role" required>
                         <option value="client">Client</option>
                         <option value="driver">Driver</option>
                         <option value="admin">Admin</option>
                     </select>
                 </div>
-                <div class="mb-3">
-                    <label for="address" class="form-label">Address (optional for clients)</label>
-                    <input type="text" class="form-control" id="address" name="address">
-                </div>
                 <button type="submit" class="btn btn-primary">Sign Up</button>
             </form>
+            <?php echo $message; ?>
         </div>
     </div>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.min.js"></script>
 </body>
 </html>

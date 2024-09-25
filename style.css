@@ -1,10 +1,30 @@
 /* General Styles */
 body {
-    background: linear-gradient(135deg, #F4F4F9 0%, #E9E9F0 100%);  /* Subtle gradient background */
+    background: linear-gradient(135deg, rgba(244, 244, 249, 0.7), rgba(233, 233, 240, 0.7));  /* Subtle gradient background */
     font-family: 'Arial', sans-serif;  /* Clean font */
     color: #333;  /* Darker text color for readability */
     margin: 0;  /* Remove default margin */
     padding: 0;  /* Remove default padding */
+}
+
+/* Navbar Styles */
+.navbar {
+    padding: 1rem 2rem; /* Add vertical and horizontal padding */
+}
+
+.navbar-brand {
+    font-weight: bold; /* Make the brand text bold */
+    font-size: 1.5rem; /* Increase the font size */
+}
+
+.nav-link {
+    margin-left: 20px; /* Add space between nav items */
+    font-weight: 500; /* Slightly bold the nav links */
+}
+
+.nav-link:hover {
+    color: #0056b3; /* Change color on hover */
+    text-decoration: underline; /* Underline on hover */
 }
 
 /* Container Styles */
@@ -78,11 +98,11 @@ h4 {
 }
 
 /* Footer Styles */
-.footer {
-    text-align: center;
-    margin-top: 20px;
-    font-size: 14px;
-    color: #888;
+footer {
+    background-color: #002147; /* Dark blue color */
+    color: white; /* Text color */
+    text-align: center; /* Center text */
+    padding: 1rem; /* Add padding */
 }
 
 /* Form Styles */
@@ -110,45 +130,30 @@ h4 {
 /* Card Styles */
 .card {
     border-radius: 15px;  /* Rounded corners for the card */
-    box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);  /* Subtle shadow for depth */
-    margin-bottom: 20px;  /* Space below the card */
+    box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);  /* Soft shadow for depth */
 }
 
-/* Card Header Styles */
-.card-header {
-    display: flex;  /* Use flexbox for layout */
-    justify-content: space-between;  /* Space out title and button */
-    align-items: center;  /* Center align items */
-    padding: 10px;  /* Add some padding */
-}
-
-/* Card Title */
-.card-title {
-    color: #001F3F;  /* Navy blue */
-}
-
-/* Logout Button */
+/* Logout Button Styles */
 .logout-btn {
-    background-color: #dc3545;  /* Red background for the logout button */
-    border: none;  /* Remove border */
+    float: right;  /* Align to the right */
+    margin-top: -50px;  /* Position above the navbar */
+    background-color: #d9534f;  /* Red background */
     color: white;  /* White text color */
-    padding: 8px 15px;  /* Padding for the button */
+    border: none;  /* Remove border */
     border-radius: 5px;  /* Rounded corners */
+    padding: 8px 15px;  /* Add padding */
     transition: background-color 0.3s ease;  /* Smooth transition */
 }
 
 .logout-btn:hover {
-    background-color: #c82333;  /* Darker shade on hover */
+    background-color: #c9302c;  /* Darker shade on hover */
 }
 
-/* Responsive Adjustments */
-@media (max-width: 768px) {
-    .dashboard-container {
-        max-width: 90%;  /* Use a higher percentage for smaller screens */
-        padding: 20px;  /* Reduced padding for smaller screens */
-    }
-
-    h2.dashboard-header {
-        font-size: 24px;  /* Adjust font size for smaller screens */
-    }
+/* Hero Section Styles */
+.hero-section {
+    height: 100vh;  /* Full viewport height */
+    display: flex;  /* Flexbox for centering */
+    align-items: center;  /* Center items vertically */
+    justify-content: center;  /* Center items horizontally */
+    text-align: center;  /* Center text */
 }

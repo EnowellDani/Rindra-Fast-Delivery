@@ -1,8 +1,8 @@
 <?php
 session_start();
-require 'database.php';  // Include database connection
-require 'order.php';     // Include the Order class
-require 'driver.php';    // Include the Driver class
+require 'D:\ApplicationDir\laragon\Rindra-Fast-Delivery\database.php';  // Include database connection
+require 'D:\ApplicationDir\laragon\Rindra-Fast-Delivery\class\order.php';     // Include the Order class
+require 'D:\ApplicationDir\laragon\Rindra-Fast-Delivery\class\driver.php';    // Include the Driver class
 
 // Check if the user is logged in and is an admin
 if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
@@ -109,20 +109,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['create_order'])) {
 <body>
 
 <!-- Navbar -->
-<nav class="navbar navbar-expand-lg navbar-light bg-light">
-    <a class="navbar-brand" href="index.php">Rindra Delivery Service</a>
-    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav">
-        <span class="navbar-toggler-icon"></span>
-    </button>
-    <div class="collapse navbar-collapse" id="navbarNav">
-        <ul class="navbar-nav">
-            <li class="nav-item active">
-                <a class="nav-link" href="logout.php">Logout</a>
-            </li>
-        </ul>
-    </div>
-</nav>
-
+    <header>
+        <nav class="navbar navbar-expand-lg navbar-light bg-light">
+            <a class="navbar-brand" href="../index.php">Rindra Delivery Service</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav">
+                    <li class="nav-item active">
+                        <a class="nav-link" href="../logout.php">Logout</a> <!-- Updated path -->
+                    </li>
+                </ul>
+            </div>
+        </nav>
+    </header>
 <div class="container mt-2">
     <div class="card dashboard-container">
         <div class="card-header d-flex justify-content-between align-items-center">
