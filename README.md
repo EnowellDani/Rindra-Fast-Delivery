@@ -5,7 +5,7 @@
 
 ## Project Overview
 
-This project is developed as part of the **Web App Development (IT341)** course and was assigned by **Mr. Rindra Razafinjatovo** as a case study for the midterm exam.
+This project is developed as part of the **Web App Development (IT341)** course and was assigned by **Mr. Rindra Razafinjatovo** as a case study project.
 
 ### Case Study: Managing Daily Operations for Rindra Delivery Service
 
