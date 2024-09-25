@@ -11,23 +11,27 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'client') {
 $user_id = $_SESSION['user_id'];
 
 // Fetch client information
-$stmt = $pdo->prepare("SELECT name FROM clients WHERE id = :user_id");
+$stmt = $pdo->prepare("SELECT name, phone AS client_phone FROM clients WHERE id = :user_id");
 $stmt->execute([':user_id' => $user_id]);
-$client_name = $stmt->fetchColumn();
+$client_info = $stmt->fetch(PDO::FETCH_ASSOC);
+$client_name = $client_info['name'];
+$client_phone = $client_info['client_phone'];
 
-// Fetch active orders for the logged-in client including client phone number
-$stmt = $pdo->prepare("SELECT o.*, d.name AS driver_name, c.phone AS client_phone 
+// Fetch active orders for the logged-in client
+$stmt = $pdo->prepare("SELECT o.*, d.name AS driver_name 
                         FROM orders o 
                         LEFT JOIN drivers d ON o.driver_id = d.id 
-                        LEFT JOIN clients c ON o.client_id = c.id 
-                        WHERE o.client_id = :client_id AND o.status != 'delivered'");
+                        WHERE o.client_id = :client_id AND o.status != 'completed'");
 $stmt->execute([':client_id' => $user_id]);
 $active_orders = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-// Fetch order history (delivered orders)
-$stmt = $pdo->prepare("SELECT o.*, d.name AS driver_name FROM orders o LEFT JOIN drivers d ON o.driver_id = d.id WHERE o.client_id = :client_id AND o.status = 'completed'");
+// Fetch order history (completed or cancelled orders)
+$stmt = $pdo->prepare("SELECT o.*, d.name AS driver_name 
+                        FROM order_history o 
+                        LEFT JOIN drivers d ON o.driver_id = d.id 
+                        WHERE o.client_id = :client_id");
 $stmt->execute([':client_id' => $user_id]);
-$order_history = $stmt->fetchAll(PDO::FETCH_ASSOC);
+$order_history = $stmt->fetchAll(PDO::FETCH_ASSOC)
 ?>
 
 <!-- HTML for Client Dashboard -->
@@ -72,7 +76,7 @@ $order_history = $stmt->fetchAll(PDO::FETCH_ASSOC);
                         <th>Status</th>
                         <th>Driver Name</th>
                         <th>Delivery Address</th>
-                        <th>Contact Info</th> <!-- Updated to show client's phone -->
+                        <th>Contact Info</th> <!-- Show client's phone -->
                     </tr>
                 </thead>
                 <tbody>
@@ -82,7 +86,7 @@ $order_history = $stmt->fetchAll(PDO::FETCH_ASSOC);
                             <td><?= ucfirst(htmlspecialchars($order['status'])); ?></td>
                             <td><?= htmlspecialchars($order['driver_name'] ?: 'Not Assigned'); ?></td>
                             <td><?= htmlspecialchars($order['address']); ?></td>
-                            <td><?= htmlspecialchars($order['client_phone'] ?? ''); ?></td> <!-- Updated line -->
+                            <td><?= htmlspecialchars($client_phone); ?></td> <!-- Show client's phone -->
                         </tr>
                     <?php endforeach; ?>
                 </tbody>
@@ -101,7 +105,7 @@ $order_history = $stmt->fetchAll(PDO::FETCH_ASSOC);
                         <th>Order ID</th>
                         <th>Status</th>
                         <th>Driver Name</th>
-                        <th>Updated At</th>
+                        <th>Created At</th>
                         <th>Delivery Address</th>
                         <th>Contact Info</th>
                     </tr>
@@ -112,9 +116,9 @@ $order_history = $stmt->fetchAll(PDO::FETCH_ASSOC);
                             <td><?= htmlspecialchars($order['id']); ?></td>
                             <td><?= ucfirst(htmlspecialchars($order['status'])); ?></td>
                             <td><?= htmlspecialchars($order['driver_name'] ?: 'Not Assigned'); ?></td>
-                            <td><?= htmlspecialchars($order['updated_at']); ?></td>
+                            <td><?= htmlspecialchars($order['created_at']); ?></td>
                             <td><?= htmlspecialchars($order['address']); ?></td>
-                            <td><?= htmlspecialchars($order['client_phone'] ?? ''); ?></td> <!-- Updated line -->
+                            <td><?= htmlspecialchars($client_phone); ?></td> <!-- Show client's phone -->
                         </tr>
                     <?php endforeach; ?>
                 </tbody>
