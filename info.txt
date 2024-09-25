@@ -1,0 +1,12 @@
+Login information
+--- Client ---
+email: enowell@gmail.com
+password: enowellclient
+--- Driver ---
+email: manly@gmail.com
+password: manlydriver
+--- Admin ---
+email: danny@gmail.com
+password: danieyladmin
+
+MYSQL -u kbitboy -p danieyl

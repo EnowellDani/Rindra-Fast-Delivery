@@ -24,7 +24,28 @@ $drivers = $pdo->query("SELECT * FROM drivers")->fetchAll(PDO::FETCH_ASSOC);
 
 // Handle user approval or rejection
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
-    // Approve or reject logic (existing code)
+    $user_id = $_POST['user_id'];
+    $action = $_POST['action']; // 'approve' or 'reject'
+
+    if ($action === 'approve') {
+        // Update the pending user to approved
+        $stmt = $pdo->prepare("INSERT INTO clients (name, email, phone, password) 
+                                SELECT username, email, phone, password FROM pending_users 
+                                WHERE id = :user_id");
+        $stmt->execute([':user_id' => $user_id]);
+
+        // Delete the user from the pending_users table
+        $stmt = $pdo->prepare("DELETE FROM pending_users WHERE id = :user_id");
+        $stmt->execute([':user_id' => $user_id]);
+
+        echo '<div class="alert alert-success">User approved successfully!</div>';
+    } elseif ($action === 'reject') {
+        // Delete the user from the pending_users table
+        $stmt = $pdo->prepare("DELETE FROM pending_users WHERE id = :user_id");
+        $stmt->execute([':user_id' => $user_id]);
+
+        echo '<div class="alert alert-danger">User rejected successfully!</div>';
+    }
 }
 
 // Handle order assignment
