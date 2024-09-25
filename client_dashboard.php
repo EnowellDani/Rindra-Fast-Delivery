@@ -15,13 +15,17 @@ $stmt = $pdo->prepare("SELECT name FROM clients WHERE id = :user_id");
 $stmt->execute([':user_id' => $user_id]);
 $client_name = $stmt->fetchColumn();
 
-// Fetch active orders for the logged-in client
-$stmt = $pdo->prepare("SELECT o.*, d.name AS driver_name FROM orders o LEFT JOIN drivers d ON o.driver_id = d.id WHERE o.client_id = :client_id AND o.status != 'delivered'");
+// Fetch active orders for the logged-in client including client phone number
+$stmt = $pdo->prepare("SELECT o.*, d.name AS driver_name, c.phone AS client_phone 
+                        FROM orders o 
+                        LEFT JOIN drivers d ON o.driver_id = d.id 
+                        LEFT JOIN clients c ON o.client_id = c.id 
+                        WHERE o.client_id = :client_id AND o.status != 'delivered'");
 $stmt->execute([':client_id' => $user_id]);
 $active_orders = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 // Fetch order history (delivered orders)
-$stmt = $pdo->prepare("SELECT o.*, d.name AS driver_name FROM orders o LEFT JOIN drivers d ON o.driver_id = d.id WHERE o.client_id = :client_id AND o.status = 'delivered'");
+$stmt = $pdo->prepare("SELECT o.*, d.name AS driver_name FROM orders o LEFT JOIN drivers d ON o.driver_id = d.id WHERE o.client_id = :client_id AND o.status = 'completed'");
 $stmt->execute([':client_id' => $user_id]);
 $order_history = $stmt->fetchAll(PDO::FETCH_ASSOC);
 ?>
@@ -79,33 +83,33 @@ $order_history = $stmt->fetchAll(PDO::FETCH_ASSOC);
         <h2 class="dashboard-header">Welcome to Your Dashboard, <?= htmlspecialchars($client_name); ?>!</h2>
         <h4 class="text-center mb-4">Active Orders</h4>
 
-        <!-- Active Orders Table -->
-        <?php if (!empty($active_orders)): ?>
-            <table class="table table-custom table-bordered">
-                <thead>
+    <!-- Active Orders Table -->
+    <?php if (!empty($active_orders)): ?>
+        <table class="table table-custom table-bordered">
+            <thead>
+                <tr>
+                    <th>Order ID</th>
+                    <th>Status</th>
+                    <th>Driver Name</th>
+                    <th>Delivery Address</th>
+                    <th>Contact Info</th> <!-- Updated to show client's phone -->
+                </tr>
+            </thead>
+            <tbody>
+                <?php foreach ($active_orders as $order): ?>
                     <tr>
-                        <th>Order ID</th>
-                        <th>Status</th>
-                        <th>Driver Name</th>
-                        <th>Delivery Address</th>
-                        <th>Contact Info</th>
+                        <td><?= htmlspecialchars($order['id']); ?></td>
+                        <td><?= ucfirst(htmlspecialchars($order['status'])); ?></td>
+                        <td><?= htmlspecialchars($order['driver_name'] ?: 'Not Assigned'); ?></td>
+                        <td><?= htmlspecialchars($order['address']); ?></td>
+                        <td><?= htmlspecialchars($order['client_phone'] ?? ''); ?></td> <!-- Updated line -->
                     </tr>
-                </thead>
-                <tbody>
-                    <?php foreach ($active_orders as $order): ?>
-                        <tr>
-                            <td><?= htmlspecialchars($order['id']); ?></td>
-                            <td><?= ucfirst(htmlspecialchars($order['status'])); ?></td>
-                            <td><?= htmlspecialchars($order['driver_name'] ?: 'Not Assigned'); ?></td>
-                            <td><?= htmlspecialchars($order['address']); ?></td>
-                            <td><?= htmlspecialchars($order['contact_info']); ?></td>
-                        </tr>
-                    <?php endforeach; ?>
-                </tbody>
-            </table>
-        <?php else: ?>
-            <p class="text-center">You have no active orders.</p>
-        <?php endif; ?>
+                <?php endforeach; ?>
+            </tbody>
+        </table>
+    <?php else: ?>
+        <p class="text-center">You have no active orders.</p>
+    <?php endif; ?>
 
         <h4 class="text-center mb-4 mt-5">Order History</h4>
 

@@ -5,52 +5,88 @@ require 'database.php';  // Include your database connection
 $message = ''; // Variable to store success or error message
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $name = $_POST['name'];    // Get name from the form
-    $email = $_POST['email'];
-    $phone = $_POST['phone'];  // Get phone number
-    $address = $_POST['address'];  // Get address
+    $name = trim($_POST['name']);    // Get name from the form
+    $email = trim($_POST['email']);
+    $phone = trim($_POST['phone']);  // Get phone number
+    $address = trim($_POST['address']);  // Get address
     $password = $_POST['password'];
     $role = $_POST['role'];
 
-    // Hash the password
-    $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
+    // Initialize validation flags
+    $valid = true;
 
-    // Separate queries for checking if the email already exists in each table
-    $tables = ['pending_users', 'clients', 'drivers', 'admins'];
-    $emailExists = false;
-
-    foreach ($tables as $table) {
-        $stmt = $pdo->prepare("SELECT email FROM $table WHERE email = :email");
-        $stmt->execute([':email' => $email]);
-
-        if ($stmt->fetchColumn()) {
-            $emailExists = true;
-            break;
-        }
+    // Validate Name
+    if (empty($name)) {
+        $message .= '<div class="alert alert-danger">Name is required.</div>';
+        $valid = false;
     }
 
-    if ($emailExists) {
-        $message = '<div class="alert alert-danger">Error: This email is already registered. Please use a different email.</div>';
-    } else {
-        // Prepare the INSERT statement into the pending_users table
-        $stmt = $pdo->prepare("
-            INSERT INTO pending_users (username, email, phone, role, password, address) 
-            VALUES (:username, :email, :phone, :role, :password, :address)
-        ");
-        
-        $params = [
-            ':username' => $name,
-            ':email' => $email,
-            ':phone' => $phone,
-            ':role' => $role,
-            ':password' => $hashedPassword,
-            ':address' => $address
-        ];
+    // Validate Email
+    if (empty($email) || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
+        $message .= '<div class="alert alert-danger">A valid email is required.</div>';
+        $valid = false;
+    }
 
-        if ($stmt->execute($params)) {
-            $message = '<div class="alert alert-success">Registration successful. Please wait for admin approval.</div>';
+    // Validate Phone (optional: can add more checks for format)
+    if (!empty($phone) && !preg_match('/^[0-9]+$/', $phone)) {
+        $message .= '<div class="alert alert-danger">Phone number must contain only digits.</div>';
+        $valid = false;
+    }
+
+    // Validate Password
+    if (empty($password)) {
+        $message .= '<div class="alert alert-danger">Password is required.</div>';
+        $valid = false;
+    } elseif (strlen($password) < 6) {
+        $message .= '<div class="alert alert-danger">Password must be at least 6 characters long.</div>';
+        $valid = false;
+    }
+
+    // Proceed only if validation passed
+    if ($valid) {
+        // Hash the password
+        $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
+
+        // Separate queries for checking if the email already exists in each table
+        $tables = ['pending_users', 'clients', 'drivers', 'admins'];
+        $emailExists = false;
+
+        foreach ($tables as $table) {
+            $stmt = $pdo->prepare("SELECT email FROM $table WHERE email = :email");
+            $stmt->execute([':email' => $email]);
+
+            if ($stmt->fetchColumn()) {
+                $emailExists = true;
+                break;
+            }
+        }
+
+        if ($emailExists) {
+            $message .= '<div class="alert alert-danger">Error: This email is already registered. Please use a different email.</div>';
         } else {
-            $message = '<div class="alert alert-danger">Error during registration. Please try again.</div>';
+            // Prepare the INSERT statement into the pending_users table
+            $stmt = $pdo->prepare("
+                INSERT INTO pending_users (username, email, phone, role, password, address) 
+                VALUES (:username, :email, :phone, :role, :password, :address)
+            ");
+            
+            $params = [
+                ':username' => $name,
+                ':email' => $email,
+                ':phone' => $phone,
+                ':role' => $role,
+                ':password' => $hashedPassword,
+                ':address' => $address
+            ];
+
+            if ($stmt->execute($params)) {
+                $_SESSION['signup_message'] = 'Thank you for signing up! Please wait for approval and check your email for updates regarding your registration.';
+                // Redirect to index.php after successful registration
+                header('Location: index.php');
+                exit(); // Stop further execution
+            } else {
+                $message .= '<div class="alert alert-danger">Error during registration. Please try again.</div>';
+            }
         }
     }
 }

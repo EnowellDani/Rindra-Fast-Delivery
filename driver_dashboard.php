@@ -2,35 +2,35 @@
 session_start();
 require 'database.php';  // Include database connection
 require 'order.php';     // Include the Order class
-require 'driver.php';    // Include the Driver class
 
-// Check if the driver is logged in
+// Check if the user is logged in and is a driver
 if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'driver') {
-    header("Location: index.php");  // Redirect to login if not authenticated
+    header("Location: index.php"); // Redirect to login page if not logged in or not driver
     exit;
 }
 
-// Instantiate the driver object using the session user ID
-$driver = new Driver($pdo, $_SESSION['user_id']);
+// Fetch assigned orders for the driver
+$driver_id = $_SESSION['user_id']; // Get logged-in driver's ID
+$orders = $pdo->prepare("SELECT orders.*, clients.name AS client_name FROM orders JOIN clients ON orders.client_id = clients.id WHERE orders.driver_id = :driver_id");
+$orders->execute([':driver_id' => $driver_id]);
+$assigned_orders = $orders->fetchAll(PDO::FETCH_ASSOC);
 
-// Fetch assigned orders for this driver
-$assignedOrders = $driver->getAssignedOrders();
+// Handle order status updates
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_status'])) {
+    $order_id = $_POST['order_id'];
+    $status = $_POST['status'];
 
-// Handle the order status update
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $orderId = $_POST['order_id'];
-    $newStatus = $_POST['status'];
+    // Validate the status value to ensure it matches the ENUM values in the database
+    $valid_statuses = ['pending', 'completed', 'canceled'];
+    if (in_array($status, $valid_statuses)) {
+        // Update the order status
+        $stmt = $pdo->prepare("UPDATE orders SET status = :status WHERE id = :order_id AND driver_id = :driver_id");
+        $stmt->execute([':status' => $status, ':order_id' => $order_id, ':driver_id' => $driver_id]);
 
-    // Update order status using the Order class
-    $order = new Order($pdo, $orderId);
-    if ($order->updateStatus($newStatus)) {
-        $message = "Order status updated successfully!";
+        echo '<div class="alert alert-success">Order status updated successfully!</div>';
     } else {
-        $message = "Failed to update order status!";
+        echo '<div class="alert alert-danger">Invalid status selected!</div>';
     }
-
-    // Refresh the assigned orders after updating the status
-    $assignedOrders = $driver->getAssignedOrders();
 }
 ?>
 
@@ -43,45 +43,45 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
 <body>
-<div class="container mt-4">
-    <h1>Driver Dashboard</h1>
-    
-    <?php if (isset($message)): ?>
-        <div class="alert alert-info">
-            <?= htmlspecialchars($message) ?>
-        </div>
-    <?php endif; ?>
-
-    <h2>Assigned Orders</h2>
-    <table class="table table-striped">
+<div class="container mt-2">
+    <form method="POST" action="logout.php">
+        <button type="submit" class="btn btn-danger">Logout</button>
+    </form>
+</div>
+<div class="container mt-5">
+    <h2>Your Assigned Orders</h2>
+    <table class="table">
         <thead>
             <tr>
+                <th>Order ID</th>
                 <th>Client Name</th>
                 <th>Delivery Address</th>
                 <th>Status</th>
-                <th>Action</th>
+                <th>Update Status</th>
             </tr>
         </thead>
         <tbody>
-            <?php if (empty($assignedOrders)): ?>
+            <?php if (empty($assigned_orders)): ?>
                 <tr>
-                    <td colspan="4" class="text-center">No assigned orders found.</td>
+                    <td colspan="5" class="text-center">No orders assigned to you.</td>
                 </tr>
             <?php else: ?>
-                <?php foreach ($assignedOrders as $order): ?>
+                <?php foreach ($assigned_orders as $order): ?>
                     <tr>
+                        <td><?= htmlspecialchars($order['id']) ?></td>
                         <td><?= htmlspecialchars($order['client_name']) ?></td>
-                        <td><?= htmlspecialchars($order['delivery_address']) ?></td>
+                        <td><?= htmlspecialchars($order['address']) ?></td>
                         <td><?= htmlspecialchars($order['status']) ?></td>
                         <td>
-                            <form method="POST">
+                            <form method="POST" action="driver_dashboard.php">
                                 <input type="hidden" name="order_id" value="<?= htmlspecialchars($order['id']) ?>">
-                                <select name="status" class="form-select">
-                                    <option value="pending" <?= $order['status'] === 'pending' ? 'selected' : '' ?>>Pending</option>
-                                    <option value="picked_up" <?= $order['status'] === 'picked_up' ? 'selected' : '' ?>>Picked Up</option>
-                                    <option value="delivered" <?= $order['status'] === 'delivered' ? 'selected' : '' ?>>Delivered</option>
+                                <select name="status" class="form-select" required>
+                                    <option value="">Select Status</option>
+                                    <option value="pending">Pending</option>
+                                    <option value="completed">Completed</option>
+                                    <option value="canceled">Canceled</option>
                                 </select>
-                                <button type="submit" class="btn btn-primary mt-2">Update</button>
+                                <button type="submit" name="update_status" class="btn btn-primary mt-2">Update</button>
                             </form>
                         </td>
                     </tr>
@@ -90,7 +90,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         </tbody>
     </table>
 </div>
-
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
