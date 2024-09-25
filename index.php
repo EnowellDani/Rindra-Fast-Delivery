@@ -10,40 +10,46 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $email = $_POST['email'];  // Using email for login
     $password = $_POST['password'];
 
-    // Fetch the user from the database by email
-    $stmt = $pdo->prepare("SELECT * FROM admins WHERE email = ?"); // Check admin first
+    // Initialize variables for roles
+    $admin = null;
+    $user = null;
+    $client = null;
+
+    // Fetch the admin from the database by email
+    $stmt = $pdo->prepare("SELECT * FROM admins WHERE email = ?");
     $stmt->execute([$email]);
     $admin = $stmt->fetch();
 
-    // Fetch user for driver and client if admin not found
+    // If not an admin, check for a driver
     if (!$admin) {
-        $stmt = $pdo->prepare("SELECT * FROM users WHERE email = ?"); // Check users (drivers)
+        $stmt = $pdo->prepare("SELECT * FROM users WHERE email = ?");
         $stmt->execute([$email]);
         $user = $stmt->fetch();
         
-        // Fetch client if neither admin nor user found
+        // If not a driver, check for a client
         if (!$user) {
-            $stmt = $pdo->prepare("SELECT * FROM clients WHERE email = ?"); // Check clients
+            $stmt = $pdo->prepare("SELECT * FROM clients WHERE email = ?");
             $stmt->execute([$email]);
             $client = $stmt->fetch();
-            var_dump($client);  // Debugging output
         }
     }
 
-    // Check if the user exists and if the password is correct
+    // Check if the admin exists and if the password is correct
     if ($admin && password_verify($password, $admin['password'])) {
         $_SESSION['user_id'] = $admin['id'];
         $_SESSION['role'] = 'admin';
         header('Location: admin_dashboard.php');
         exit;
 
+    // Check if the driver exists and if the password is correct
     } elseif ($user && password_verify($password, $user['password'])) {
         $_SESSION['user_id'] = $user['id'];
         $_SESSION['role'] = 'driver';
         header('Location: driver_dashboard.php');
         exit;
 
-    } elseif (isset($client) && password_verify($password, $client['password'])) {
+    // Check if the client exists and if the password is correct
+    } elseif ($client && password_verify($password, $client['password'])) {
         $_SESSION['user_id'] = $client['id'];
         $_SESSION['role'] = 'client';
         header('Location: client_dashboard.php');

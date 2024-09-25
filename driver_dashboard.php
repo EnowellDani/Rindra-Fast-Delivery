@@ -1,26 +1,27 @@
 <?php
 session_start();
-require 'database.php';  // Include your database connection
-require 'order.php';     // Include the Order class
-require 'driver.php';    // Include the Driver class
+require 'database.php';  // Ensure this path is correct
+require 'order.php';     // Assuming you have an Order class
+require 'driver.php';    // Assuming you have a Driver class
 
 // Check if the driver is logged in
-if (!isset($_SESSION['driver_id'])) {
+if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'driver') {
     header("Location: index.php");  // Redirect to login if not authenticated
     exit;
 }
 
-// Instantiate the driver object
-$driver = new Driver($pdo, $_SESSION['driver_id']);
+// Instantiate the driver object using the session user ID
+$driver = new Driver($pdo, $_SESSION['user_id']);
 
-// Get the list of assigned orders
+// Fetch assigned orders for this driver
 $assignedOrders = $driver->getAssignedOrders();
 
+// Handle the order status update
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $orderId = $_POST['order_id'];
     $newStatus = $_POST['status'];
 
-    // Instantiate the order object and update the status
+    // Update order status using the Order class
     $order = new Order($pdo, $orderId);
     if ($order->updateStatus($newStatus)) {
         $message = "Order status updated successfully!";
@@ -36,7 +37,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Driver Dashboard</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
 <body>
 <div class="container mt-4">
@@ -44,7 +45,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     
     <?php if (isset($message)): ?>
         <div class="alert alert-info">
-            <?= $message ?>
+            <?= htmlspecialchars($message) ?>
         </div>
     <?php endif; ?>
 
@@ -80,5 +81,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         </tbody>
     </table>
 </div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

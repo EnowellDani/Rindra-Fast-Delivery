@@ -8,10 +8,11 @@ class Driver {
         $this->driverId = $driverId;
     }
 
+    // Method to get assigned orders for the driver
     public function getAssignedOrders() {
-        $stmt = $this->pdo->prepare("SELECT * FROM orders WHERE driver_id = :driver_id");
-        $stmt->execute([':driver_id' => $this->driverId]);
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        $stmt = $this->pdo->prepare("SELECT * FROM orders WHERE driver_id = ?");
+        $stmt->execute([$this->driverId]);
+        return $stmt->fetchAll();
     }
 }
 ?>
