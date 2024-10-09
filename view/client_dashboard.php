@@ -32,6 +32,7 @@ $active_orders = $stmt->fetchAll(PDO::FETCH_ASSOC);
 <!-- HTML for Client Dashboard -->
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -39,13 +40,14 @@ $active_orders = $stmt->fetchAll(PDO::FETCH_ASSOC);
     <link rel="stylesheet" href="style.css">  <!-- Link to your external CSS file -->
     <title>Client Dashboard</title>
 </head>
+
 <body>
 
 <!-- Navbar -->
 <header>
     <nav class="navbar navbar-expand-lg navbar-light bg-light shadow-sm">
         <div class="container">
-            <a class="navbar-brand fw-bold" href="../index.php">Rindra Delivery Service</a> <!-- Bold text for brand -->
+            <a class="navbar-brand fw-bold" href="../index.php">Rindra Delivery Service</a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
@@ -65,7 +67,7 @@ $active_orders = $stmt->fetchAll(PDO::FETCH_ASSOC);
         <div class="col-md-10 col-lg-8">
             <div class="card shadow">
                 <div class="card-header text-center bg-primary text-white">
-                    <h2 class="dashboard-header">Welcome to Your Dashboard, <?= htmlspecialchars($client_name); ?>!</h2>
+                    <h2 class="mb-0">Welcome to Your Dashboard, <?= htmlspecialchars($client_name); ?>!</h2>
                 </div>
                 <div class="card-body">
 
@@ -117,4 +119,5 @@ $active_orders = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
+
 </html>

@@ -62,6 +62,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_order'])) {
 
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -69,11 +70,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_order'])) {
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="../style.css" rel="stylesheet"> <!-- Link your CSS file -->
 </head>
+
 <body>
     <header>
         <nav class="navbar navbar-expand-lg navbar-light bg-light shadow-sm">
             <div class="container">
-                <a class="navbar-brand" href="../index.php">Rindra Delivery Service</a>
+                <a class="navbar-brand" href="../index.php"><strong>Rindra Delivery Service</strong></a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                 </button>
@@ -87,12 +89,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_order'])) {
             </div>
         </nav>
     </header>
-    
+
     <div class="container mt-4">
         <?php if ($successMessage): // Display the success message if set ?>
-            <div class="alert alert-success"><?= htmlspecialchars($successMessage) ?></div>
+            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                <?= htmlspecialchars($successMessage) ?>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
         <?php endif; ?>
-        
+
         <div class="card shadow">
             <div class="card-header bg-primary text-white">
                 <h3 class="mb-0">Assigned Orders</h3>
@@ -139,7 +144,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_order'])) {
             </div>
         </div>
     </div>
-    
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
+
 </html>
