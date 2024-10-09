@@ -12,22 +12,15 @@ if (!is_logged_in()) {
 // Get the user role from the session
 $user_role = $_SESSION['role']; // Define the variable here
 
-// Admin role check
-if ($user_role !== 'admin') {
-    header('Location: not_authorized.php');
-    exit();
-}
-
 // Initialize variables for search and filter
 $clientSearch = '';
 $driverSearch = '';
-$search = ''; // Initialize the search variable to avoid undefined variable warning
 $limit = 10; // Number of records per page
 $page = isset($_GET['page']) ? (int)$_GET['page'] : 1; // Current page number
 $offset = ($page - 1) * $limit; // Calculate the offset
 $totalDeliveries = 0; // Initialize to avoid undefined variable warning
 
-// Prepare the main SQL query to fetch history based on search and filters
+// Base SQL query
 $sql = "SELECT h.*, c.name AS client_name, d.name AS driver_name 
         FROM order_history h 
         JOIN clients c ON h.client_id = c.id 
@@ -37,34 +30,50 @@ $sql = "SELECT h.*, c.name AS client_name, d.name AS driver_name
 // Initialize parameters array
 $params = [];
 
-// Handle search input for client name
-if (isset($_GET['client_search']) && !empty($_GET['client_search'])) {
+// Filter based on user role
+if ($user_role === 'client') {
+    $clientId = $_SESSION['user_id']; // Assuming user_id is stored in session for clients
+    $sql .= " AND h.client_id = :clientId";
+    $params[':clientId'] = $clientId;
+} elseif ($user_role === 'driver') {
+    $driverId = $_SESSION['user_id']; // Assuming user_id is stored in session for drivers
+    $sql .= " AND h.driver_id = :driverId";
+    $params[':driverId'] = $driverId;
+}
+
+// Handle search input for client name (Admin only)
+if ($user_role === 'admin' && isset($_GET['client_search']) && !empty($_GET['client_search'])) {
     $clientSearch = $_GET['client_search'];
     $sql .= " AND c.name LIKE :clientSearch";
     $params[':clientSearch'] = "%$clientSearch%"; // Bind value directly
 }
 
-// Handle search input for driver name
-if (isset($_GET['driver_search']) && !empty($_GET['driver_search'])) {
+// Handle search input for driver name (Admin only)
+if ($user_role === 'admin' && isset($_GET['driver_search']) && !empty($_GET['driver_search'])) {
     $driverSearch = $_GET['driver_search'];
     $sql .= " AND d.name LIKE :driverSearch";
     $params[':driverSearch'] = "%$driverSearch%"; // Bind value directly
 }
 
-// Count total deliveries for pagination
 try {
-    // Prepare the count statement based on the search conditions
+    // Count total deliveries for pagination
     $countSql = "SELECT COUNT(*) FROM order_history h 
                  JOIN clients c ON h.client_id = c.id 
                  LEFT JOIN drivers d ON h.driver_id = d.id 
                  WHERE 1=1"; // Same condition structure
 
     // Add the same filters to the count SQL
-    if (isset($_GET['client_search']) && !empty($_GET['client_search'])) {
-        $countSql .= " AND c.name LIKE :clientSearch";
-    }
-    if (isset($_GET['driver_search']) && !empty($_GET['driver_search'])) {
-        $countSql .= " AND d.name LIKE :driverSearch";
+    if ($user_role === 'client') {
+        $countSql .= " AND h.client_id = :clientId";
+    } elseif ($user_role === 'driver') {
+        $countSql .= " AND h.driver_id = :driverId";
+    } elseif ($user_role === 'admin') {
+        if (isset($_GET['client_search']) && !empty($_GET['client_search'])) {
+            $countSql .= " AND c.name LIKE :clientSearch";
+        }
+        if (isset($_GET['driver_search']) && !empty($_GET['driver_search'])) {
+            $countSql .= " AND d.name LIKE :driverSearch";
+        }
     }
 
     // Prepare the count statement
@@ -96,6 +105,22 @@ try {
 
 // Pagination logic
 $totalPages = ceil($totalDeliveries / $limit);
+
+// Determine the dashboard URL based on user role
+switch ($user_role) {
+    case 'admin':
+        $dashboard_url = 'admin_dashboard.php';
+        break;
+    case 'driver':
+        $dashboard_url = 'driver_dashboard.php';
+        break;
+    case 'client':
+        $dashboard_url = 'client_dashboard.php';
+        break;
+    default:
+        $dashboard_url = 'index.php'; // Fallback
+}
+
 ?>
 
 <!DOCTYPE html>
@@ -119,16 +144,18 @@ $totalPages = ceil($totalDeliveries / $limit);
             <a href="<?= htmlspecialchars($dashboard_url) ?>" class="btn btn-outline-secondary btn-lg">Back to Dashboard</a>
         </div>
 
-        <!-- Search Form -->
-        <div class="row mb-4">
-            <div class="col-md-6 mx-auto">
-                <form method="GET" action="" class="d-flex">
-                    <input type="text" name="client_search" class="form-control me-2" placeholder="Search by Client Name" value="<?= htmlspecialchars($clientSearch ?? '') ?>">
-                    <input type="text" name="driver_search" class="form-control me-2" placeholder="Search by Driver Name" value="<?= htmlspecialchars($driverSearch ?? '') ?>">
-                    <button type="submit" class="btn btn-primary">Search</button>
-                </form>
+        <!-- Search Form (Admin Only) -->
+        <?php if ($user_role === 'admin'): ?>
+            <div class="row mb-4">
+                <div class="col-md-6 mx-auto">
+                    <form method="GET" action="" class="d-flex">
+                        <input type="text" name="client_search" class="form-control me-2" placeholder="Search by Client Name" value="<?= htmlspecialchars($clientSearch ?? '') ?>">
+                        <input type="text" name="driver_search" class="form-control me-2" placeholder="Search by Driver Name" value="<?= htmlspecialchars($driverSearch ?? '') ?>">
+                        <button type="submit" class="btn btn-primary">Search</button>
+                    </form>
+                </div>
             </div>
-        </div>
+        <?php endif; ?>
 
         <!-- Deliveries Table -->
         <div class="table-responsive">
