@@ -1,6 +1,9 @@
 <?php
 session_start();
 require 'D:\ApplicationDir\laragon\Rindra-Fast-Delivery\database.php';  // Include database connection
+require '../auth.php'; // Include the authentication file
+
+check_role('driver'); // Ensure only driver can access this page
 
 // Check if the user is logged in and is a driver
 if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'driver') {
@@ -68,33 +71,35 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_order'])) {
 </head>
 <body>
     <header>
-        <nav class="navbar navbar-expand-lg navbar-light bg-light">
-            <a class="navbar-brand" href="../index.php">Rindra Delivery Service</a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav">
-                    <li class="nav-item active">
-                        <a class="nav-link" href="../logout.php">Logout</a> <!-- Updated path -->
-                    </li>
-                </ul>
+        <nav class="navbar navbar-expand-lg navbar-light bg-light shadow-sm">
+            <div class="container">
+                <a class="navbar-brand" href="../index.php">Rindra Delivery Service</a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarNav">
+                    <div class="ms-auto">
+                        <form action="../logout.php" method="post" class="d-inline">
+                            <button type="submit" class="btn btn-danger">Logout</button>
+                        </form>
+                    </div>
+                </div>
             </div>
         </nav>
     </header>
     
-    <div class="container mt-2">
+    <div class="container mt-4">
         <?php if ($successMessage): // Display the success message if set ?>
             <div class="alert alert-success"><?= htmlspecialchars($successMessage) ?></div>
         <?php endif; ?>
         
-        <div class="card">
-            <div class="card-header">
-                <h3 class="dashboard-header">Assigned Orders</h3>
+        <div class="card shadow">
+            <div class="card-header bg-primary text-white">
+                <h3 class="mb-0">Assigned Orders</h3>
             </div>
             <div class="card-body">
-                <table class="table table-striped table-bordered ">
-                    <thead>
+                <table class="table table-striped table-hover">
+                    <thead class="table-light">
                         <tr>
                             <th>Order ID</th>
                             <th>Client Name</th>
@@ -107,29 +112,34 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_order'])) {
                     <tbody>
                         <?php foreach ($orders as $order): ?>
                             <tr>
-                                <td><?= $order['id'] ?></td>
-                                <td><?= $order['client_name'] ?></td>
-                                <td><?= $order['client_phone'] ?></td>
-                                <td><?= $order['address'] ?></td>
-                                <td><?= $order['status'] ?></td>
+                                <td><?= htmlspecialchars($order['id']) ?></td>
+                                <td><?= htmlspecialchars($order['client_name']) ?></td>
+                                <td><?= htmlspecialchars($order['client_phone']) ?></td>
+                                <td><?= htmlspecialchars($order['address']) ?></td>
+                                <td><?= htmlspecialchars($order['status']) ?></td>
                                 <td>
-                                    <form action="" method="post">
-                                        <input type="hidden" name="order_id" value="<?= $order['id'] ?>">
-                                        <select name="status">
-                                            <option value="pending">Pending</option>
-                                            <option value="in-progress">In Progress</option>
-                                            <option value="completed">Completed</option>
-                                            <option value="canceled">Canceled</option>
+                                    <form action="" method="post" class="d-inline">
+                                        <input type="hidden" name="order_id" value="<?= htmlspecialchars($order['id']) ?>">
+                                        <select name="status" class="form-select d-inline" style="width: auto;">
+                                            <option value="pending" <?= $order['status'] == 'pending' ? 'selected' : '' ?>>Pending</option>
+                                            <option value="in-progress" <?= $order['status'] == 'in-progress' ? 'selected' : '' ?>>In Progress</option>
+                                            <option value="completed" <?= $order['status'] == 'completed' ? 'selected' : '' ?>>Completed</option>
+                                            <option value="canceled" <?= $order['status'] == 'canceled' ? 'selected' : '' ?>>Canceled</option>
                                         </select>
-                                        <button type="submit" name="update_order" class="btn btn-primary">Update Status</button>
+                                        <button type="submit" name="update_order" class="btn btn-secondary btn-sm ms-2">Update</button>
                                     </form>
                                 </td>
                             </tr>
                         <?php endforeach; ?>
                     </tbody>
                 </table>
+                <div class="text-center mt-4">
+                    <a href="history.php" class="btn btn-info">View Delivery History</a>
+                </div>
             </div>
         </div>
     </div>
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

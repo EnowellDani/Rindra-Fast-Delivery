@@ -6,6 +6,7 @@ class User {
     protected $email;
     protected $phone;
     protected $password;
+    protected $role; // New property for user role
 
     public function __construct($pdo, $userId) {
         $this->pdo = $pdo;
@@ -24,6 +25,7 @@ class User {
             $this->email = $user['email'];
             $this->phone = $user['phone'];
             $this->password = $user['password']; // Store hashed password securely
+            $this->role = $user['role']; // Load role from the database
         } else {
             throw new Exception("User not found");
         }
@@ -42,9 +44,26 @@ class User {
         return $this->phone;
     }
 
-    // Method for user authentication (you can expand this)
+    public function getRole() {
+        return $this->role; // New method to get the user role
+    }
+
+    // Method for user authentication
     public function authenticate($password) {
         return password_verify($password, $this->password);
+    }
+
+    // Role checks
+    public function isAdmin() {
+        return $this->role === 'admin';
+    }
+
+    public function isDriver() {
+        return $this->role === 'driver';
+    }
+
+    public function isClient() {
+        return $this->role === 'client';
     }
 }
 ?>

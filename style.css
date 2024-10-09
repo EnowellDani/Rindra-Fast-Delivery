@@ -7,24 +7,44 @@ body {
     padding: 0;  /* Remove default padding */
 }
 
-/* Navbar Styles */
+/* Header Styles */
 .navbar {
-    padding: 1rem 2rem; /* Add vertical and horizontal padding */
+    background-color: #4a90e2; /* Change to your preferred color */
+    padding: 1rem; /* Adjust padding as needed */
 }
 
 .navbar-brand {
-    font-weight: bold; /* Make the brand text bold */
-    font-size: 1.5rem; /* Increase the font size */
+    font-size: 1.8rem; /* Font size for the brand name */
+    font-weight: bold; /* Make the font bold */
+    color: #ffffff; /* Text color */
+    text-transform: uppercase; /* Uppercase text */
+    letter-spacing: 1.5px; /* Letter spacing */
 }
 
-.nav-link {
-    margin-left: 20px; /* Add space between nav items */
-    font-weight: 500; /* Slightly bold the nav links */
+/* For responsive buttons */
+.navbar-nav .nav-item .btn {
+    margin-left: 10px;
+    transition: background-color 0.3s;
 }
 
-.nav-link:hover {
-    color: #0056b3; /* Change color on hover */
-    text-decoration: underline; /* Underline on hover */
+.nav-link.btn {
+    transition: background-color 0.3s, color 0.3s; /* Smooth transition for hover effects */
+}
+
+.nav-link.btn:hover {
+    background-color: #0056b3; /* Darker shade for both buttons on hover */
+    color: #fff; /* White text for better contrast */
+}
+
+/* Responsive Styles */
+@media (max-width: 768px) {
+    .navbar {
+        flex-direction: column; /* Stack items vertically on smaller screens */
+    }
+
+    .navbar-brand {
+        margin-bottom: 10px; /* Add space below brand name */
+    }
 }
 
 /* Container Styles */
@@ -37,7 +57,7 @@ body {
 .dashboard-container {
     padding: 40px;
     background-color: #fff;  /* White background for the card */
-    border-radius: 10px;
+    border-radius: 10px; /* Use Bootstrap's border radius */
     box-shadow: 0px 8px 24px rgba(0, 0, 0, 0.15);  /* Deeper shadow for a floating effect */
     max-width: 600px;  /* Set a maximum width for the card */
     width: 100%;  /* Ensure it takes full width within max-width */
@@ -62,7 +82,7 @@ h4 {
 /* Table Styles */
 .table-custom {
     border: 2px solid #001F3F;  /* Navy blue */
-    border-radius: 5px;
+    border-radius: .25rem; /* Use Bootstrap's border radius */
     width: 100%;  /* Full width */
     margin-top: 20px;  /* Space above the table */
     overflow: hidden;  /* Prevent border-radius from being overridden */
@@ -83,8 +103,8 @@ h4 {
     background-color: #001F3F;  /* Navy blue */
     border: none;  /* Remove border */
     color: white;  /* White text color */
-    border-radius: 8px;  /* More rounded corners */
-    padding: 10px 20px;  /* Increased padding */
+    border-radius: .25rem; /* Use Bootstrap's border radius */
+    padding: .5rem 1rem; /* Bootstrap-like padding */
     transition: background-color 0.3s ease, transform 0.3s ease;  /* Smooth transition */
 }
 
