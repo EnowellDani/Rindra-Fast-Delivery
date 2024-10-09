@@ -15,14 +15,9 @@ $options = [
 
 try {
     // Create a PDO instance
-    $pdo = new PDO($dsn, $user, $pass, $options);  // Correct assignment
-    // Uncomment to check connection
-    // echo "Database connection successful!";
+    $pdo = new PDO($dsn, $user, $pass, $options);
 } catch (\PDOException $e) {
-    // Log the error message to a file for troubleshooting
     error_log("Database Connection Error: " . $e->getMessage(), 3, 'error_log.txt');
-    
-    // Output a generic message to the user, without exposing sensitive details
     echo "Database connection failed! Please try again later.";
 }
 ?>

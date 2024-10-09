@@ -7,9 +7,24 @@ require 'class/user.php'; // Adjust this path according to your project structur
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
+// Function to generate CSRF token
+function generate_csrf_token() {
+    if (empty($_SESSION['csrf_token'])) {
+        $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+    }
+    return $_SESSION['csrf_token'];
+}
+
+// Handle POST request
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $email = $_POST['email'];  // Using email for login
-    $password = $_POST['password'];
+    // Validate CSRF token
+    if (!hash_equals($_SESSION['csrf_token'], $_POST['csrf_token'])) {
+        die("CSRF token validation failed.");
+    }
+
+    // Sanitize inputs
+    $email = filter_input(INPUT_POST, 'email', FILTER_SANITIZE_EMAIL);
+    $password = htmlspecialchars(trim($_POST['password'])); // Updated sanitization for password
 
     // Initialize user variables
     $admin = null;
@@ -88,6 +103,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <div class="card-body">
                     <h2 class="card-title text-center mb-4">Login</h2>
                     <form method="POST">
+                        <input type="hidden" name="csrf_token" value="<?php echo generate_csrf_token(); ?>">
                         <div class="form-group mb-3">
                             <label for="email" class="form-label">Email</label>
                             <input type="email" id="email" name="email" class="form-control" required>
